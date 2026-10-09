@@ -1,0 +1,21 @@
+<!-- Your Main Website Layout -->
+<iframe id="gameFrame" src="https://your-game-site.com" width="100%" height="600px"></iframe>
+
+<script>
+  const iframe = document.getElementById('gameFrame');
+
+  iframe.onload = function() {
+    // This only works if both pages share the exact same domain, protocol, and port
+    try {
+      fetch('https://raw.githubusercontent.com/idislikebluecheese/worldguessr-hacks/refs/heads/main/nogui/minifed.js')
+        .then(r => r.text())
+        .then(scriptText => {
+          // Execute the script contextually within the iframe's window scope
+          iframe.contentWindow.eval(scriptText);
+        })
+        .catch(er => window.alert("Fetch Error: " + er.message));
+    } catch (e) {
+      console.error("Security Block: Cannot access iframe context due to Same-Origin Policy.", e);
+    }
+  };
+</script>
