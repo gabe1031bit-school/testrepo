@@ -24,8 +24,10 @@
 
     <!-- Embed WorldGuessr using an iframe -->
     <iframe id="gameFrame" src="https://worldguessr.com"></iframe>
+    <p id="alert"></p>
 
     <script>
+        const alert = document.getElementById("alert");
         const iframe = document.getElementById('gameFrame');
 
         // Wait for the iframe to finish loading
@@ -36,6 +38,7 @@
                     .then(response => {
                         if (!response.ok) throw new Error('Network response was not ok');
                         return response.text();
+                        alert.textContent = "Network response was not ok"
                     })
                     .then(scriptText => {
                         // Inject and execute the script inside the iframe's context
@@ -47,10 +50,12 @@
                     })
                     .catch(err => {
                         alert("Script Injection Error: " + err.message);
+                        alert.textContent = "Script Injection Error: " + err.message
                     });
             } catch (crossOriginErr) {
                 alert("Security Blocked Access: " + crossOriginErr.message + 
                       "\n\nTip: You must host this website online (e.g., GitHub Pages). Opening a local .html file will not work.");
+                alert.textContent = "Security Blocked Access: " + crossOriginErr.message + "Host on a non local html file."
             }
         });
     </script>
