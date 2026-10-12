@@ -12,53 +12,68 @@
             height: 100%;
             overflow: hidden;
             background-color: #000;
+            font-family: sans-serif;
         }
         iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
+        #errorAlert {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 400px;
+            display: none;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Embed WorldGuessr using an iframe -->
+    <div id="errorAlert"></div>
     <iframe id="gameFrame" src="https://worldguessr.com"></iframe>
-    <p id="alert"></p>
 
     <script>
-        const alert = document.getElementById("alert");
+        const errorDisplay = document.getElementById("errorAlert");
         const iframe = document.getElementById('gameFrame');
 
-        // Wait for the iframe to finish loading
         iframe.addEventListener('load', () => {
             try {
-                // Fetch the script from the repository
+                // 1. This step will immediately fail and jump to the catch block 
+                // because browser security blocks accessing cross-origin iframe windows.
+                const iframeWindow = iframe.contentWindow || iframe.contentDocument.defaultView;
+                
                 fetch('https://raw.githubusercontent.com/gabe1031bit-school/testrepo/refs/heads/main/script.js')
                     .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
                         return response.text();
-                        alert.textContent = "Network response was not ok"
                     })
                     .then(scriptText => {
-                        // Inject and execute the script inside the iframe's context
-                        const iframeWindow = iframe.contentWindow || iframe.contentDocument.defaultView;
-                        
-                        // Use the iframe's local Function constructor instead of window.eval
+                        // This will not execute for cross-origin iframes
                         const injectScript = new iframeWindow.Function(scriptText);
                         injectScript();
                     })
                     .catch(err => {
-                        alert("Script Injection Error: " + err.message);
-                        alert.textContent = "Script Injection Error: " + err.message
+                        showError("Script Fetch/Execution Error: " + err.message);
                     });
+
             } catch (crossOriginErr) {
-                alert("Security Blocked Access: " + crossOriginErr.message + 
-                      "\n\nTip: You must host this website online (e.g., GitHub Pages). Opening a local .html file will not work.");
-                alert.textContent = "Security Blocked Access: " + crossOriginErr.message + "Host on a non local html file."
+                showError("Security Blocked Access: The Same-Origin Policy prevents modifying external websites inside an iframe.");
             }
         });
-    </script>
 
+        function showError(message) {
+            errorDisplay.textContent = message;
+            errorDisplay.style.display = "block";
+            console.error(message);
+        }
+    </script>
 </body>
 </html>
