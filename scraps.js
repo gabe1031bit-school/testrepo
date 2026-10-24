@@ -93,7 +93,7 @@
     ["🦸", "Invincibility", () => {
       Runner.prototype.gameOver = function(){}
     }],
-    ["💯", "999999 Score", () => {
+    ["💯", "999999 Score", async () => {
       while (true) {
         Runner.instance_.distanceRan = 999999 / Runner.instance_.distanceMeter.config.COEFFICIENT
 
