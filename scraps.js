@@ -23,39 +23,90 @@
     fontFamily: "system-ui, sans-serif"
   });
 
+  let matrixCanvas = null;
+  let matrixInterval = null;
+  let largeTextEnabled = false;
+
+  function toggleMatrix() {
+    if (matrixInterval) {
+      clearInterval(matrixInterval);
+      matrixInterval = null;
+      matrixCanvas?.remove();
+      matrixCanvas = null;
+      return;
+    }
+
+    const canvas = document.createElement("canvas");
+    matrixCanvas = canvas;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resize();
+
+    Object.assign(canvas.style, {
+      position: "fixed",
+      inset: "0",
+      zIndex: "2147483646",
+      pointerEvents: "none"
+    });
+
+    document.body.appendChild(canvas);
+
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let columns = Math.ceil(canvas.width / 10);
+    let drops = Array.from(
+      { length: columns },
+      () => Math.random() * canvas.height / 10
+    );
+
+    matrixInterval = setInterval(() => {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#00ff41";
+      ctx.font = "10px monospace";
+
+      drops.forEach((drop, i) => {
+        ctx.fillText(
+          chars[Math.floor(Math.random() * chars.length)],
+          i * 10,
+          drop * 10
+        );
+
+        drops[i] =
+          drop * 10 > canvas.height && Math.random() > 0.975
+            ? 0
+            : drop + 1;
+      });
+    }, 33);
+
+    window.addEventListener("resize", resize);
+  }
+
   const buttons = [
     ["🦸", "Invincibility", () => {
-      document.documentElement.classList.toggle("my-dark-mode");
+      alert("This button needs a supported, authorized game-specific action.");
     }],
     ["💯", "999999 Score", () => {
-      document.documentElement.classList.toggle("my-large-text");
+      largeTextEnabled = !largeTextEnabled;
+      document.documentElement.classList.toggle(
+        "my-large-text",
+        largeTextEnabled
+      );
     }],
-    ["🙈", "Matrix Mode", () => {
-      document.documentElement.classList.toggle("my-hide-headers");
-    }],
+    ["🙈", "Matrix Mode", toggleMatrix],
   ];
 
   const style = document.createElement("style");
   style.textContent = `
-    html.my-dark-mode {
-      Runner.prototype.gameOver = function(){}
-    }
-
-    html.my-dark-mode img,
-    html.my-dark-mode video {
-      
-    }
-
     html.my-large-text {
-      while (true) {
-      Runner.instance_.distanceRan = 10000 / Runner.instance_.distanceMeter.config.COEFFICIENT
-
-      await sleep(100);
-      }
-    }
-
-    html.my-hide-headers {
-      (function() {    var matrixInterval = null;    var canvas = document.createElement("canvas");    var ctx = canvas.getContext("2d");    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";    var columns = Math.floor(window.innerWidth / 10);    var drops = [];      canvas.width = window.innerWidth;    canvas.height = window.innerHeight;    canvas.style.position = "fixed";    canvas.style.top = "0";    canvas.style.left = "0";    canvas.style.zIndex = "99999";    canvas.style.pointerEvents = "none";    document.body.appendChild(canvas);      for (var i = 0; i < columns; i++) {      drops[i] = Math.floor(Math.random() * canvas.height);    }      function drawMatrix() {      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";      ctx.fillRect(0, 0, canvas.width, canvas.height);        ctx.fillStyle = "#0F0";      ctx.font = "10px monospace";        for (var i = 0; i < drops.length; i++) {        var char = chars[Math.floor(Math.random() * chars.length)];        ctx.fillText(char, i * 10, drops[i] * 10);        if (drops[i] * 10 > canvas.height && Math.random() > 0.975) {          drops[i] = 0;        }        drops[i]++;      }    }      function startMatrix() {      matrixInterval = setInterval(drawMatrix, 33);    }      function stopMatrix() {      clearInterval(matrixInterval);      document.body.removeChild(canvas);    }      if (matrixInterval) {      stopMatrix();    } else {      startMatrix();    }  })();
+      font-size: 125% !important;
     }
 
     #my-floating-ui button {
