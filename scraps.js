@@ -91,14 +91,14 @@
 
   const buttons = [
     ["🦸", "Invincibility", () => {
-      alert("This button needs a supported, authorized game-specific action.");
+      Runner.prototype.gameOver = function(){}
     }],
     ["💯", "999999 Score", () => {
-      largeTextEnabled = !largeTextEnabled;
-      document.documentElement.classList.toggle(
-        "my-large-text",
-        largeTextEnabled
-      );
+      while (true) {
+        Runner.instance_.distanceRan = 999999 / Runner.instance_.distanceMeter.config.COEFFICIENT
+
+        await sleep(100);
+      }
     }],
     ["🙈", "Matrix Mode", toggleMatrix],
   ];
